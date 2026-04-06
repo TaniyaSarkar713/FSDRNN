@@ -1,0 +1,157 @@
+
+######################################################################
+  TUNING: power
+######################################################################
+
+  === FSDRNN hyperparameter search ===
+
+  Grid search: 24 configurations
+    entropy_reg: [0.0, 0.005, 0.01, 0.05]
+    lr: [0.0005, 0.001, 0.005]
+    weight_decay: [1e-05, 0.0001]
+    train/val sizes: 400 / 100
+    [1/24] entropy_reg=0.0, lr=0.0005, weight_decay=1e-05  →  val d²=8.908651
+    [2/24] entropy_reg=0.0, lr=0.0005, weight_decay=0.0001  →  val d²=8.788427
+    [3/24] entropy_reg=0.0, lr=0.001, weight_decay=1e-05  →  val d²=9.429451
+    [4/24] entropy_reg=0.0, lr=0.001, weight_decay=0.0001  →  val d²=9.717022
+    [5/24] entropy_reg=0.0, lr=0.005, weight_decay=1e-05  →  val d²=8.623008
+    [6/24] entropy_reg=0.0, lr=0.005, weight_decay=0.0001  →  val d²=8.167958
+    [7/24] entropy_reg=0.005, lr=0.0005, weight_decay=1e-05  →  val d²=8.930792
+    [8/24] entropy_reg=0.005, lr=0.0005, weight_decay=0.0001  →  val d²=8.659704
+    [9/24] entropy_reg=0.005, lr=0.001, weight_decay=1e-05  →  val d²=9.599178
+    [10/24] entropy_reg=0.005, lr=0.001, weight_decay=0.0001  →  val d²=9.003954
+    [11/24] entropy_reg=0.005, lr=0.005, weight_decay=1e-05  →  val d²=9.347917
+    [12/24] entropy_reg=0.005, lr=0.005, weight_decay=0.0001  →  val d²=8.719973
+    [13/24] entropy_reg=0.01, lr=0.0005, weight_decay=1e-05  →  val d²=9.204942
+    [14/24] entropy_reg=0.01, lr=0.0005, weight_decay=0.0001  →  val d²=8.868953
+    [15/24] entropy_reg=0.01, lr=0.001, weight_decay=1e-05  →  val d²=9.017188
+    [16/24] entropy_reg=0.01, lr=0.001, weight_decay=0.0001  →  val d²=9.014438
+    [17/24] entropy_reg=0.01, lr=0.005, weight_decay=1e-05  →  val d²=9.078017
+    [18/24] entropy_reg=0.01, lr=0.005, weight_decay=0.0001  →  val d²=9.323171
+    [19/24] entropy_reg=0.05, lr=0.0005, weight_decay=1e-05  →  val d²=9.351721
+    [20/24] entropy_reg=0.05, lr=0.0005, weight_decay=0.0001  →  val d²=8.958516
+    [21/24] entropy_reg=0.05, lr=0.001, weight_decay=1e-05  →  val d²=9.045129
+    [22/24] entropy_reg=0.05, lr=0.001, weight_decay=0.0001  →  val d²=9.796577
+    [23/24] entropy_reg=0.05, lr=0.005, weight_decay=1e-05  →  val d²=8.418219
+    [24/24] entropy_reg=0.05, lr=0.005, weight_decay=0.0001  →  val d²=9.086616
+
+  Best params:    {'entropy_reg': 0.0, 'lr': 0.005, 'weight_decay': 0.0001}
+  Best val d²:    8.167958
+
+  === DFR hyperparameter search ===
+
+  DFR Grid search: 16 configurations
+    hidden: [16, 32]
+    layer: [3, 4]
+    lr: [0.0005, 0.001]
+    manifold_dim: [1, 2]
+    train/val sizes: 400 / 100
+    [1/16] hidden=16, layer=3, lr=0.0005, manifold_dim=1  →  val d²=9.715353
+    [2/16] hidden=16, layer=3, lr=0.0005, manifold_dim=2  →  val d²=9.926281
+    [3/16] hidden=16, layer=3, lr=0.001, manifold_dim=1  →  val d²=10.775600
+    [4/16] hidden=16, layer=3, lr=0.001, manifold_dim=2  →  val d²=10.926915
+    [5/16] hidden=16, layer=4, lr=0.0005, manifold_dim=1  →  val d²=8.650515
+    [6/16] hidden=16, layer=4, lr=0.0005, manifold_dim=2  →  val d²=9.361026
+    [7/16] hidden=16, layer=4, lr=0.001, manifold_dim=1  →  val d²=7.301577
+    [8/16] hidden=16, layer=4, lr=0.001, manifold_dim=2  →  val d²=8.074664
+    [9/16] hidden=32, layer=3, lr=0.0005, manifold_dim=1  →  val d²=9.054029
+    [10/16] hidden=32, layer=3, lr=0.0005, manifold_dim=2  →  val d²=8.820397
+    [11/16] hidden=32, layer=3, lr=0.001, manifold_dim=1  →  val d²=10.141260
+    [12/16] hidden=32, layer=3, lr=0.001, manifold_dim=2  →  val d²=10.784325
+    [13/16] hidden=32, layer=4, lr=0.0005, manifold_dim=1  →  val d²=11.031892
+    [14/16] hidden=32, layer=4, lr=0.0005, manifold_dim=2  →  val d²=12.022700
+    [15/16] hidden=32, layer=4, lr=0.001, manifold_dim=1  →  val d²=11.274776
+    [16/16] hidden=32, layer=4, lr=0.001, manifold_dim=2  →  val d²=12.157351
+
+  Best DFR params: {'hidden': 16, 'layer': 4, 'lr': 0.001, 'manifold_dim': 1}
+  Best val d²:     7.301577
+
+  --- Chosen FSDRNN params: {'entropy_reg': 0.0, 'lr': 0.005, 'weight_decay': 0.0001}
+  --- Chosen DFR params:    {'hidden': 16, 'layer': 4, 'lr': 0.001, 'manifold_dim': 1}
+
+
+######################################################################
+  METRIC: power  |  5 repetitions
+  FSDRNN tuned: {'entropy_reg': 0.0, 'lr': 0.005, 'weight_decay': 0.0001}
+  DFR tuned:    {'hidden': 16, 'layer': 4, 'lr': 0.001, 'manifold_dim': 1}
+######################################################################
+
+======================================================================
+  Metric: power
+  n_train=500, n_test=200, df=6, seed=42
+  hidden_sizes=[128, 128, 64], epochs=150, lr=0.005
+  entropy_reg (λ)=0.0
+  [TUNED NN params: {'entropy_reg': 0.0, 'lr': 0.005, 'weight_decay': 0.0001}]
+  [TUNED DFR params: {'hidden': 16, 'layer': 4, 'lr': 0.001, 'manifold_dim': 1}]
+======================================================================
+
+  Input shape:    X ~ (12,)
+  Response shape: Y ~ (5, 5)
+  Y is SPD: eigenvalues = [0.003784946398809552, 0.025491395965218544, 0.32014429569244385, 0.5962264537811279, 1.249617338180542]
+  True mean E[Y|X] diag: [0.7840360403060913, 0.6759551763534546, 0.1390186995267868, 0.2977571487426758, 0.6584993004798889]
+
+  Model parameters: 58,932
+  Output dim (n_ref): 500
+Epoch    1/150 | power loss = 7.147407
+Epoch   15/150 | power loss = 4.730363
+Epoch   30/150 | power loss = 2.870156
+Epoch   45/150 | power loss = 1.848424
+Epoch   60/150 | power loss = 1.519477
+Epoch   75/150 | power loss = 1.321528
+Epoch   90/150 | power loss = 1.161673
+Epoch  105/150 | power loss = 1.061662
+Epoch  120/150 | power loss = 0.975995
+Epoch  135/150 | power loss = 0.977063
+Epoch  150/150 | power loss = 0.801721
+
+  --- Results (power) ---
+  Training time:       4.1s
+  Final train loss:    0.801721
+  Test avg d(pred, Y): 2.458161
+  Test avg d²(pred,Y): 7.356269
+  (d(pred, E[Y|X]) skipped: true Fréchet mean unknown for power)
+
+  --- Competitor comparison ---
+  Global Mean avg d:   2.781945
+  FSDRNN avg d:        2.458161
+  FSDRNN Improvement:  11.6%
+
+  --- Global Fréchet Regression ---
+  GFR avg d:           2.608877
+  GFR Improvement:     6.2%
+  GFR time:            0.1s
+
+  --- Deep Fréchet Regression (DFR) ---
+  [DFR] computing pairwise distance matrix …
+  [DFR] manifold learning (isomap, r=1) …
+  [DFR] training DNN for Z dimension 1/1 …
+       epoch 100/500  MSE=0.952432
+       epoch 200/500  MSE=0.705755
+       epoch 300/500  MSE=0.339631
+       epoch 400/500  MSE=0.240311
+       epoch 500/500  MSE=0.201638
+  [DFR] bandwidth = [0.3612508]
+  DFR avg d:           2.329606
+  DFR Improvement:     16.3%
+  DFR time:            0.4s
+  rep 2/5 (seed=43) …  FSDRNN=2.4714
+  rep 3/5 (seed=44) …  FSDRNN=2.5791
+  rep 4/5 (seed=45) …  FSDRNN=2.5557
+  rep 5/5 (seed=46) …  FSDRNN=2.5382
+
+
+======================================================================
+  RESULTS: power  (5 reps)
+  n_train=500, n_test=200, df=6, epochs=150
+  FSDRNN tuned: {'entropy_reg': 0.0, 'lr': 0.005, 'weight_decay': 0.0001}
+  DFR tuned:    {'hidden': 16, 'layer': 4, 'lr': 0.001, 'manifold_dim': 1}
+======================================================================
+  Method                         Mean d(pred,Y)         SE
+  --------------------------------------------------------
+  Global Mean                          2.732352   0.024574
+  GFR                                  2.565768   0.024889
+  DFR                                  2.395987   0.087601
+  FSDRNN                               2.520504   0.023751
+
+  FSDRNN improvement over Global Mean: 7.7% ± 1.7%
+

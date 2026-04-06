@@ -1,0 +1,44 @@
+=== nvidia-smi ===
+GPU 0: NVIDIA RTX 4500 Ada Generation (UUID: GPU-b4912789-861c-fc34-f484-b7feab8a13a1)
+GPU 1: NVIDIA RTX 4500 Ada Generation (UUID: GPU-e7a9771b-6f9d-fbd8-571c-78ec2a00d74b)
+torch: 2.10.0+cu128
+cuda available: True
+gpu: NVIDIA RTX 4500 Ada Generation
+
+======================================================================
+  Metric: power
+  n_train=2000, n_test=500, df=6, seed=42
+  hidden_sizes=[128, 128, 64], epochs=150, lr=0.001
+  entropy_reg (λ)=0.01
+======================================================================
+
+  Input shape:    X ~ (12,)
+  Response shape: Y ~ (5, 5)
+  Y is SPD: eigenvalues = [0.012019463814795017, 0.06543608009815216, 0.21380272507667542, 0.6120886206626892, 15.505083084106445]
+  True mean E[Y|X] diag: [5.359220027923584, 0.7003036141395569, 0.11096808314323425, 0.03086431883275509, 0.2905678153038025]
+
+  Model parameters: 156,432
+  Output dim (n_ref): 2000
+Epoch    1/150 | power loss = 7.216333
+Epoch   15/150 | power loss = 4.144073
+Epoch   30/150 | power loss = 3.410734
+Epoch   45/150 | power loss = 2.914601
+Epoch   60/150 | power loss = 2.603678
+Epoch   75/150 | power loss = 2.408513
+Epoch   90/150 | power loss = 2.216511
+Epoch  105/150 | power loss = 2.096187
+Epoch  120/150 | power loss = 2.033178
+Epoch  135/150 | power loss = 1.870496
+Epoch  150/150 | power loss = 1.790409
+
+  --- Results (power) ---
+  Training time:       138.4s
+  Final train loss:    1.790409
+  Test avg d(pred, Y): 1.845172
+  Test avg d²(pred,Y): 4.176455
+  (d(pred, E[Y|X]) skipped: true Fréchet mean unknown for power)
+
+  --- Baseline comparison ---
+  Baseline avg d:      2.722080
+  NN avg d:            1.845172
+  Improvement:         32.2%

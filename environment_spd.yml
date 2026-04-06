@@ -1,0 +1,24 @@
+# This file may be used to create an environment using:
+# $ conda env create -f environment_spd.yml
+# $ conda activate spd_frechet
+#
+# For HPC / RCC with CUDA GPUs (linux-64).
+# PyTorch 2.4 + CUDA 12.4 — requires sm_70+ (RTX A4000/A4500/A4500 Ada).
+# NOT compatible with GTX 1080 Ti (sm_61).
+#
+# Minimal environment for running:
+#   python simulations/test_spd_frechet.py --device cuda
+name: spd_frechet
+channels:
+  - pytorch
+  - nvidia
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy=1.26
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - pytorch::pytorch=2.4
+  - pytorch::pytorch-cuda=12.4
+  - pip
