@@ -1,2 +1,0 @@
-case,rep,baseline_avg_dist,baseline_avg_dist_sq,baseline_amspe,baseline_time_sec,gfr_avg_dist,gfr_avg_dist_sq,gfr_amspe,gfr_time_sec,dfr_avg_dist,dfr_avg_dist_sq,dfr_amspe,dfr_time_sec,e2m_avg_dist,e2m_avg_dist_sq,e2m_amspe,e2m_time_sec,fdrnn_avg_dist,fdrnn_avg_dist_sq,fdrnn_amspe,fdrnn_time_sec
-A,0,585.3005981445312,99180544.0,437587744.0,0.0,587.640869140625,99145520.0,437468256.0,0.1748659610748291,553.0064086914062,99061424.0,437266016.0,1.635591983795166,552.60498046875,98560960.0,119106272.0,14.93520712852478,545.8455200195312,98213952.0,118727680.0,12.383309841156006

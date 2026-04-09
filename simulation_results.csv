@@ -1,5 +1,0 @@
-setup,metric,method,mean_dist,std_dist,mean_time,n_reps,n_train,n_test,df,n_responses
-setup3,power,baseline,1.6961590051651,0,0.0,1,10,5,3,1
-setup3,power,gfr,3.399620532989502,0,0.00415492057800293,1,10,5,3,1
-setup3,power,dfr,2.100536823272705,0,1.8106780052185059,1,10,5,3,1
-setup3,power,fdrnn,1.6401668787002563,0,0.01270604133605957,1,10,5,3,1

@@ -1,2 +1,0 @@
-df,dfr_avg_dist,dfr_time_sec,fdrnn_avg_dist,fdrnn_reduction_dim,fdrnn_response_rank,fdrnn_time_sec,gfr_avg_dist,gfr_time_sec,global_mean_avg_dist,metric,n_responses,n_test,n_train,repetition,seed,setup
-6,2.5275497436523438,1.799062967300415,2.481633186340332,8,1,0.009698629379272461,2.208557605743408,0.0039048194885253906,2.0578360557556152,power,1,5,10,0,42,setup_1_basic
