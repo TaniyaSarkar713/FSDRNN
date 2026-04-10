@@ -899,13 +899,12 @@ def run_simulation(n_train=300, n_test=150, seed=42, device='cpu', verbose=False
         print(f"      MSE: {eval_metrics['mse']:.6f}, Time: {elapsed:.3f}s")
     
     # ========================================================================
-    # Oracle-reduction FSDRNN (uses true latent z with same decoder as proposed)
+    # Oracle-tuned FSDRNN (fixed d0, learned encoder; no true B_0 access)
     # ========================================================================
     if verbose:
-        print("  • Oracle-reduction FSDRNN (with true latent z)...")
+        print("  • Oracle-tuned FSDRNN (fixed d=2)...")
     start_time = time.time()
-    oracle_method = OracleFSdrnnWrapper(output_dim=40, latent_dim=2, B_true=beta, hidden_dim=16, 
-                                        lr=3e-4, epochs=1000, dropout=0.2, device=device)
+    oracle_method = FSdrnnWrapper(p=100, V=40, d=2, lr=3e-4, epochs=1000, dropout=0.2, device=device)
     oracle_method.fit(X_train, Y_train)
     Y_train_pred_oracle = oracle_method.predict(X_train)
     Y_pred_oracle = oracle_method.predict(X_test)
@@ -915,6 +914,7 @@ def run_simulation(n_train=300, n_test=150, seed=42, device='cpu', verbose=False
     eval_metrics_oracle['train_mse'] = train_metrics_oracle['mse']
     eval_metrics_oracle['gap'] = eval_metrics_oracle['mse'] - train_metrics_oracle['mse']
     eval_metrics_oracle['time_sec'] = elapsed
+    eval_metrics_oracle['fixed_d'] = 2
     results['methods']['Oracle FSDRNN'] = eval_metrics_oracle
     mse_oracle = eval_metrics_oracle['mse']
     

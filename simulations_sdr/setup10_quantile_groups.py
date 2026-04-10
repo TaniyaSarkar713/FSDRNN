@@ -611,7 +611,7 @@ def evaluate_mse(Y_true_quantiles, Y_pred_quantiles):
 
 def grid_search_fsdrnn_d(X_train, Y_train, p=20, V=20, d_values=[2, 3, 5],
                          reduction_types=('linear', 'nonlinear'), lr=5e-4, epochs=1000,
-                         dropout=0.1, device='cpu', verbose=False, val_split=0.2):
+                         hidden_dim=128, dropout=0.1, device='cpu', verbose=False, val_split=0.2):
     """
     Grid search for optimal latent dimension and reduction type using validation split.
     
@@ -647,7 +647,7 @@ def grid_search_fsdrnn_d(X_train, Y_train, p=20, V=20, d_values=[2, 3, 5],
             
             method = FSdrnnQuantileWrapper(
                 p, V, d=d, lr=lr, epochs=epochs, dropout=dropout, device=device,
-                reduction_type=reduction_type, verbose=verbose
+                hidden_dim=hidden_dim, reduction_type=reduction_type, verbose=verbose
             )
             method.fit(X_tr, Y_tr)
             
@@ -666,7 +666,7 @@ def grid_search_fsdrnn_d(X_train, Y_train, p=20, V=20, d_values=[2, 3, 5],
     best_reduction_type = best_key.split(',')[1].split('=')[1]
     best_method = FSdrnnQuantileWrapper(
         p, V, d=best_d, lr=lr, epochs=epochs, dropout=dropout, device=device,
-        reduction_type=best_reduction_type, verbose=verbose
+        hidden_dim=hidden_dim, reduction_type=best_reduction_type, verbose=verbose
     )
     best_method.fit(X_train, Y_train)
     
@@ -685,7 +685,13 @@ def run_simulation(n_train=300, n_test=150, seed=42, device='cpu', verbose=False
     
     results = {'methods': {}}
     d0_true = 2
-    true_reduction_type = 'linear'
+    oracle_reduction_type = 'nonlinear'
+    fsdrnn_hidden_dim = 128
+    fsdrnn_dropout = 0.1
+    fsdrnn_lr = 5e-4
+    fsdrnn_epochs = 1000
+    fsdrnn_val_split = 0.2
+    oracle_restarts = 5
     
     # GFR (Global Fréchet Regression)
     if verbose:
@@ -732,7 +738,8 @@ def run_simulation(n_train=300, n_test=150, seed=42, device='cpu', verbose=False
         wrapper, best_d, best_reduction_type, d_results = grid_search_fsdrnn_d(
             X_train, Y_train_quant, p=X_train.shape[1], V=Y_train_quant.shape[1],
             d_values=[2, 3, 5], reduction_types=('linear', 'nonlinear'),
-            lr=5e-4, epochs=1000, device=device, verbose=verbose
+            lr=fsdrnn_lr, epochs=fsdrnn_epochs, hidden_dim=fsdrnn_hidden_dim,
+            dropout=fsdrnn_dropout, device=device, verbose=verbose, val_split=fsdrnn_val_split
         )
         Y_train_pred = wrapper.predict(X_train)
         Y_pred = wrapper.predict(X_test)
@@ -749,21 +756,58 @@ def run_simulation(n_train=300, n_test=150, seed=42, device='cpu', verbose=False
     }
     
     # Oracle-tuned FSDRNN:
-    # knows true d0 and true reduction type, but still learns encoder.
+    # knows true d0 and fixed reduction type; uses restart selection on validation.
     if verbose:
-        print("  • Oracle FSDRNN...")
+        print(f"  • Oracle FSDRNN [R={oracle_restarts} restarts, best val]...")
     with MethodTimer('Oracle FSDRNN') as timer:
+        n_train_local = X_train.shape[0]
+        val_size_oracle = min(max(int(n_train_local * fsdrnn_val_split), 10), n_train_local - 1)
+        idx_oracle = np.arange(n_train_local)
+        np.random.default_rng(seed + 7000).shuffle(idx_oracle)
+        tr_idx_oracle = idx_oracle[:-val_size_oracle]
+        val_idx_oracle = idx_oracle[-val_size_oracle:]
+        X_tr_oracle, Y_tr_oracle = X_train[tr_idx_oracle], Y_train_quant[tr_idx_oracle]
+        X_val_oracle, Y_val_oracle = X_train[val_idx_oracle], Y_train_quant[val_idx_oracle]
+
+        best_restart_seed = None
+        best_oracle_val = float('inf')
+        for r in range(oracle_restarts):
+            restart_seed = seed + 7100 + r
+            np.random.seed(restart_seed)
+            torch.manual_seed(restart_seed)
+
+            candidate = FSdrnnQuantileWrapper(
+                input_dim=X_train.shape[1],
+                output_dim=Y_train_quant.shape[1],
+                n_quantiles=Y_train_quant.shape[2],
+                hidden_dim=fsdrnn_hidden_dim,
+                d=d0_true,
+                lr=fsdrnn_lr,
+                epochs=fsdrnn_epochs,
+                device=device,
+                dropout=fsdrnn_dropout,
+                reduction_type=oracle_reduction_type
+            )
+            candidate.fit(X_tr_oracle, Y_tr_oracle)
+            val_pred = candidate.predict(X_val_oracle)
+            val_error = evaluate_mse(Y_val_oracle, val_pred)
+            if val_error < best_oracle_val:
+                best_oracle_val = float(val_error)
+                best_restart_seed = restart_seed
+
+        np.random.seed(best_restart_seed)
+        torch.manual_seed(best_restart_seed)
         oracle = FSdrnnQuantileWrapper(
             input_dim=X_train.shape[1],
             output_dim=Y_train_quant.shape[1],
             n_quantiles=Y_train_quant.shape[2],
-            hidden_dim=128,
+            hidden_dim=fsdrnn_hidden_dim,
             d=d0_true,
-            lr=5e-4,
-            epochs=1000,
+            lr=fsdrnn_lr,
+            epochs=fsdrnn_epochs,
             device=device,
-            dropout=0.1,
-            reduction_type=true_reduction_type
+            dropout=fsdrnn_dropout,
+            reduction_type=oracle_reduction_type
         )
         oracle.fit(X_train, Y_train_quant)
         Y_pred_oracle = oracle.predict(X_test)
@@ -776,7 +820,9 @@ def run_simulation(n_train=300, n_test=150, seed=42, device='cpu', verbose=False
         'gap': float(mse_oracle - mse_train_oracle),
         'time_seconds': timer.elapsed,
         'fixed_d': d0_true,
-        'fixed_reduction_type': true_reduction_type
+        'fixed_reduction_type': oracle_reduction_type,
+        'oracle_restarts': oracle_restarts,
+        'best_val_mse': best_oracle_val
     }
     
     oracle_ratio = mse_fsdrnn / (mse_oracle + 1e-10)
@@ -788,6 +834,7 @@ def run_simulation(n_train=300, n_test=150, seed=42, device='cpu', verbose=False
         print(f"  E2M MSE: {error_e2m:.6f} ({results['methods']['E2M']['time_seconds']:.2f}s)")
         print(f"  FSDRNN MSE: {mse_fsdrnn:.6f} ({results['methods']['FSDRNN']['time_seconds']:.2f}s)")
         print(f"  Oracle FSDRNN MSE: {mse_oracle:.6f} ({results['methods']['Oracle FSDRNN']['time_seconds']:.2f}s)")
+        print(f"  Oracle best val MSE: {best_oracle_val:.6f}")
         print(f"  Oracle ratio: {oracle_ratio:.4f}")
     
     return results

@@ -924,17 +924,23 @@ def run_simulation(n_train=200, n_test=200, n_reps=10, epochs=1000, lr=0.0005, v
         if verbose:
             print(f"  FSDRNN               MSE={eval_metrics['mse']:.6f}, Train MSE={train_mse:.6f}, Gap={eval_metrics['gap']:.6f}, Best d={best_d}, Time={elapsed:.3f}s")
         
-        # 6. Oracle FSDRNN (uses true B_0 with same decoders as proposed)
+        # 6. Oracle-tuned FSDRNN (fixed d0, learned encoder; no true B_0 access)
         start_time = time.time()
-        oracle_method = OracleFSdrnnWrapper(output_dim=output_dim, latent_dim=2, B_true=beta_train, 
-                                            hidden_dim=128, lr=lr, epochs=3000, device='cpu')
+        oracle_method = FSdrnnWrapper(input_dim=input_dim, output_dim=output_dim, d=2,
+                                      hidden_dim=128, lr=lr, epochs=epochs, dropout=0.2, device='cpu')
         oracle_method.fit(X_train, Y_train)
         Y_train_pred_oracle = oracle_method.predict(X_train)
         Y_pred_oracle = oracle_method.predict(X_test)
         elapsed = time.time() - start_time
         train_mse_oracle = evaluate_mse(Y_train, Y_train_pred_oracle)
         mse_oracle = evaluate_mse(Y_test, Y_pred_oracle)
-        result['methods']['Oracle FSDRNN'] = {'mse': mse_oracle, 'train_mse': train_mse_oracle, 'gap': mse_oracle - train_mse_oracle, 'time_sec': elapsed}
+        result['methods']['Oracle FSDRNN'] = {
+            'mse': mse_oracle,
+            'train_mse': train_mse_oracle,
+            'gap': mse_oracle - train_mse_oracle,
+            'time_sec': elapsed,
+            'fixed_d': 2
+        }
         
         # Compute oracle efficiency ratio
         oracle_efficiency_ratio = mse_proposed / (mse_oracle + 1e-10)
